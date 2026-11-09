@@ -1,4 +1,4 @@
-"""LLM-facing schemas for Kindling tools."""
+"""LLM-facing schemas for Onboard Me tools."""
 
 _QA_ITEM = {
     "type": "object",
@@ -10,7 +10,7 @@ _QA_ITEM = {
 }
 
 SCHEMAS = {
-    "kindling_start": {
+    "onboard_start": {
         "type": "object",
         "properties": {
             "name": {"type": "string", "description": "Who this intake is for. Omit or 'me' for "
@@ -24,9 +24,9 @@ SCHEMAS = {
                        "description": "quick ~25 min core only; standard ~50-70 min with "
                                       "follow-ups; deep = full rabbit-hole, 90+ min across sessions"},
         },
-        "description": "Start (or resume) a Kindling deep-intake profile.",
+        "description": "Start (or resume) an Onboard Me deep-intake profile.",
     },
-    "kindling_next": {
+    "onboard_next": {
         "type": "object",
         "properties": {
             "profile": {"type": "string", "description": "Profile name; omit for the active one"},
@@ -34,11 +34,11 @@ SCHEMAS = {
         "description": "Get the next conversation section: guidance, core questions, follow-up "
                        "prompts, and care rules. Then HAVE the conversation — don't recite it.",
     },
-    "kindling_save": {
+    "onboard_save": {
         "type": "object",
         "properties": {
             "profile": {"type": "string"},
-            "section": {"type": "string", "description": "Section id from kindling_next"},
+            "section": {"type": "string", "description": "Section id from onboard_next"},
             "qa": {"type": "array", "items": _QA_ITEM,
                     "description": "Q&A pairs captured from the conversation"},
             "notes": {"type": "string", "description": "Free-form observations worth keeping"},
@@ -48,14 +48,14 @@ SCHEMAS = {
         "description": "Persist conversation answers for a section. Save after each section — "
                        "progress survives crashes and resumes anywhere.",
     },
-    "kindling_status": {
+    "onboard_status": {
         "type": "object",
         "properties": {
             "profile": {"type": "string", "description": "Omit for the active profile"},
         },
         "description": "Intake progress: coverage %, sections done/in-progress/remaining.",
     },
-    "kindling_finish": {
+    "onboard_finish": {
         "type": "object",
         "properties": {
             "profile": {"type": "string"},
@@ -64,7 +64,7 @@ SCHEMAS = {
                        "candidates, and (client mode) a handoff brief. Follow its instruction "
                        "field to land the facts in memory.",
     },
-    "kindling_setup_check": {
+    "onboard_setup_check": {
         "type": "object",
         "properties": {},
         "description": "Inspect this Hermes install (model, gateway, memory, MCP, plugins, "
@@ -72,7 +72,7 @@ SCHEMAS = {
                        "exact commands, plus a curated FAQ of real-world failure modes. "
                        "Read-only; never reads secret values.",
     },
-    "kindling_profiles": {
+    "onboard_profiles": {
         "type": "object",
         "properties": {
             "action": {"type": "string", "enum": ["list", "delete"]},

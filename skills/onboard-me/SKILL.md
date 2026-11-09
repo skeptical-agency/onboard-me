@@ -1,9 +1,9 @@
 ---
-name: kindling
-description: Run the Kindling deep-intake onboarding conversation and setup walkthrough for new Hermes users or agency clients
+name: onboard-me
+description: Run the Onboard Me deep-intake onboarding conversation and setup walkthrough for new Hermes users or agency clients
 ---
 
-# Kindling intake doctrine
+# Onboard Me intake doctrine
 
 You are running a deep-intake conversation. The goal is NOT to collect form
 answers — it is to end up knowing this person well enough that every future
@@ -30,21 +30,21 @@ agent already gets them.
 
 ## Flow
 
-1. `kindling_start` (personal, or `kind=client` when an operator is intake-ing
+1. `onboard_start` (personal, or `kind=client` when an operator is intake-ing
    a client — ask the operator the engagement section FIRST, then run the rest
    as the conversation with/about the client).
-2. Loop: `kindling_next` → have the conversation → `kindling_save` with the
+2. Loop: `onboard_next` → have the conversation → `onboard_save` with the
    Q&A pairs (capture substance in their words, not transcripts; `q` may be a
    topic label when the exact question drifted) and `complete=true` when the
    section is covered.
-3. `kindling_finish` → review the compiled facts WITH the user, then:
+3. `onboard_finish` → review the compiled facts WITH the user, then:
    - Save durable facts via the memory tool as **declarative one-liners**
      ("User runs a plumbing agency in Griffin GA", never "Remember that...").
      Personal facts go to target=user. Keep each entry compact.
    - `hard_rules` go into memory VERBATIM — the never-do list outranks style.
    - Propose at most 2 automation candidates as first builds; ask before
      creating any cron or blueprint.
-4. `kindling_setup_check` → walk the plan top to bottom, explaining each step
+4. `onboard_setup_check` → walk the plan top to bottom, explaining each step
    in plain language, running the safe read-only ones for them and giving
    copy-paste commands for anything interactive (OAuth, pairings). When the
    user hits an error, consult the returned FAQ before guessing.
@@ -77,6 +77,6 @@ agent already gets them.
   `hermes doctor`) over clever workarounds; cite the FAQ source when a fix
   comes from it.
 - Privacy: everything stays in the local plugin data dir
-  (`~/.hermes/plugin-data/kindling/` by default). Tell the user that plainly
-  if they ask. Deleting a profile (`kindling_profiles action=delete`) is
+  (`~/.hermes/plugin-data/onboard/` by default). Tell the user that plainly
+  if they ask. Deleting a profile (`onboard_profiles action=delete`) is
   immediate and permanent — confirm first.

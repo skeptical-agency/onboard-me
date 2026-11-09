@@ -20,10 +20,10 @@ def start(args, ctx=None):
         depth = args.get("depth") or "standard"
         res = engine.start_profile(name, kind, depth)
         if res.get("resumed"):
-            res["note"] = "Profile already exists — resuming. Use kindling_next for the current section."
+            res["note"] = "Profile already exists — resuming. Use onboard_next for the current section."
         else:
-            res["note"] = ("Profile created. Read the bundled kindling skill for interview "
-                           "doctrine, then call kindling_next and start the CONVERSATION — "
+            res["note"] = ("Profile created. Read the bundled onboard-me skill for interview "
+                           "doctrine, then call onboard_next and start the CONVERSATION — "
                            "warm, one question at a time, follow up before moving on.")
         return _ok(res)
     except Exception as exc:  # noqa: BLE001
@@ -89,11 +89,11 @@ def profiles(args, ctx=None):
 
 
 HANDLERS = {
-    "kindling_start": start,
-    "kindling_next": next_section,
-    "kindling_save": save,
-    "kindling_status": status,
-    "kindling_finish": finish,
-    "kindling_setup_check": setup_check,
-    "kindling_profiles": profiles,
+    "onboard_start": start,
+    "onboard_next": next_section,
+    "onboard_save": save,
+    "onboard_status": status,
+    "onboard_finish": finish,
+    "onboard_setup_check": setup_check,
+    "onboard_profiles": profiles,
 }

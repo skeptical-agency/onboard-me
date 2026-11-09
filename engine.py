@@ -1,6 +1,6 @@
-"""Kindling engine — profile storage, progress, and compilation.
+"""Onboard Me engine — profile storage, progress, and compilation.
 
-State lives in plugin_data_dir('kindling'):
+State lives in plugin_data_dir('onboard-me'):
   profiles/<slug>.json   one per person/client intake
   state.json             hook bookkeeping (greeted sessions, dismissed flag)
 
@@ -19,9 +19,9 @@ from .questions import DEPTH, get_section, sections_for
 def _data_dir() -> Path:
     try:
         from plugins.plugin_storage import plugin_data_dir  # documented public API
-        return Path(plugin_data_dir("kindling"))
+        return Path(plugin_data_dir("onboard-me"))
     except Exception:
-        p = Path.home() / ".hermes" / "plugin-data" / "kindling"
+        p = Path.home() / ".hermes" / "plugin-data" / "onboard-me"
         p.mkdir(parents=True, exist_ok=True)
         return p
 
@@ -121,7 +121,7 @@ def status(slug: str = "") -> dict:
     slug = resolve_profile(slug)
     prof = _load(slug)
     if not prof:
-        return {"error": f"no profile '{slug}'. Start one with kindling_start.",
+        return {"error": f"no profile '{slug}'. Start one with onboard_start.",
                 "existing": list_profiles()}
     secs = prof["sections"]
     done = [k for k, v in secs.items() if v["status"] == "done"]
@@ -144,7 +144,7 @@ def next_section(slug: str = "") -> dict:
     slug = resolve_profile(slug)
     prof = _load(slug)
     if not prof:
-        return {"error": f"no profile '{slug}'. Start one with kindling_start."}
+        return {"error": f"no profile '{slug}'. Start one with onboard_start."}
     order = [s["id"] for s in sections_for(prof["kind"])]
     sec = None
     for sid in order:
@@ -153,7 +153,7 @@ def next_section(slug: str = "") -> dict:
             break
     if sec is None:
         return {"all_sections_complete": True,
-                "next": "Run kindling_finish to compile the profile into memory entries, "
+                "next": "Run onboard_finish to compile the profile into memory entries, "
                         "setup recommendations, and (for clients) a handoff brief."}
     prof["sections"][sec["id"]]["status"] = "doing"
     prof["updated"] = time.strftime("%Y-%m-%dT%H:%M:%S")
@@ -173,7 +173,7 @@ def next_section(slug: str = "") -> dict:
         "depth_note": depth["note"],
         "sensitive": sec["sensitive"],
         "instruction": "Have the CONVERSATION — one question at a time, react and follow up "
-                       "before moving on. When the section is covered, call kindling_save with "
+                       "before moving on. When the section is covered, call onboard_save with "
                        "the Q&A pairs and complete=true.",
     }
 
@@ -259,7 +259,7 @@ def compile_profile(slug: str = "") -> dict:
             "entries and save the durable ones with the memory tool (target=user for personal "
             "facts). hard_rules go into memory VERBATIM — they are the never-do list. "
             "automation_candidates: propose at most 2 as first builds and ask before creating "
-            "any cron. Then run kindling_setup_check and walk the resulting plan top to bottom."
+            "any cron. Then run onboard_setup_check and walk the resulting plan top to bottom."
         ),
     }
 

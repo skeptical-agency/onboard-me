@@ -1,4 +1,4 @@
-"""Kindling setup advisor — inspects the local Hermes install and produces a
+"""Onboard Me setup advisor — inspects the local Hermes install and produces a
 personalized, beginner-safe setup plan.
 
 Grounded in real, researched failure modes (official FAQ, GitHub issues,

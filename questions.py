@@ -1,4 +1,4 @@
-"""Kindling question bank — the deep-intake interview.
+"""Onboard Me question bank — the deep-intake interview.
 
 Design rules baked into this data:
 - ONE question at a time is enforced by the skill, not here; sections are

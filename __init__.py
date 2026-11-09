@@ -1,4 +1,4 @@
-"""Kindling — light your hearth. Registration: tools, first-session hook,
+"""Onboard Me — the deep-intake onboarding + setup walkthrough. Registration: tools, first-session hook,
 slash command, bundled skill."""
 
 from pathlib import Path
@@ -7,26 +7,26 @@ from .schemas import SCHEMAS
 from .tools import HANDLERS
 
 TOOL_DESCRIPTIONS = {
-    "kindling_start": "Start or resume a deep-intake profile (personal or client) — the "
+    "onboard_start": "Start or resume a deep-intake profile (personal or client) — the "
                        "structured getting-to-know-you conversation that gives the agent context",
-    "kindling_next": "Next conversation section: guidance, questions, follow-up prompts",
-    "kindling_save": "Persist a section's Q&A (call after each section; resumable)",
-    "kindling_status": "Intake progress: coverage %, sections done/remaining",
-    "kindling_finish": "Compile intake into memory-ready facts, hard rules, automation candidates, "
+    "onboard_next": "Next conversation section: guidance, questions, follow-up prompts",
+    "onboard_save": "Persist a section's Q&A (call after each section; resumable)",
+    "onboard_status": "Intake progress: coverage %, sections done/remaining",
+    "onboard_finish": "Compile intake into memory-ready facts, hard rules, automation candidates, "
                         "client brief",
-    "kindling_setup_check": "Inspect this Hermes install and return a personalized beginner setup "
+    "onboard_setup_check": "Inspect this Hermes install and return a personalized beginner setup "
                              "plan + real-world FAQ fixes",
-    "kindling_profiles": "List or delete intake profiles",
+    "onboard_profiles": "List or delete intake profiles",
 }
 
 GREET_CONTEXT = (
-    "[kindling] This looks like a fresh Hermes install with no intake profile yet. If the user "
-    "is new or hasn't been onboarded, briefly offer the Kindling deep intake: a guided "
+    "[onboard-me] This looks like a fresh Hermes install with no intake profile yet. If the user "
+    "is new or hasn't been onboarded, briefly offer the Onboard Me deep intake: a guided "
     "conversation (~30-60 min, resumable) where you learn who they are, their work, goals, "
     "preferences and hard rules, so every future session starts with real context. If they say "
-    "yes: call kindling_start, then follow the bundled kindling skill. If they decline or "
+    "yes: call onboard_start, then follow the bundled onboard-me skill. If they decline or "
     "ignore the offer, drop it completely — do not mention it again; they can re-enable it "
-    "any time with /kindling start."
+    "any time with /onboard start."
 )
 
 
@@ -46,32 +46,32 @@ def _pre_llm(session_id="", is_first_turn=False, platform="", **kwargs):
         return None
 
 
-def _slash_kindling(raw_args: str = "") -> str:
+def _slash_onboard(raw_args: str = "") -> str:
     import json as _json
     args = (raw_args or "").strip().lower()
     if args in ("", "status"):
-        return HANDLERS["kindling_status"]({})
+        return HANDLERS["onboard_status"]({})
     if args.startswith("start"):
         rest = args[5:].strip()
-        return HANDLERS["kindling_start"]({"name": rest or "", "kind": "personal"})
+        return HANDLERS["onboard_start"]({"name": rest or "", "kind": "personal"})
     if args.startswith("client"):
         rest = args[6:].strip()
-        return HANDLERS["kindling_start"]({"name": rest, "kind": "client"})
+        return HANDLERS["onboard_start"]({"name": rest, "kind": "client"})
     if args == "setup":
-        return HANDLERS["kindling_setup_check"]({})
+        return HANDLERS["onboard_setup_check"]({})
     if args == "finish":
-        return HANDLERS["kindling_finish"]({})
+        return HANDLERS["onboard_finish"]({})
     if args in ("dismiss", "stop-asking"):
         from . import engine
         engine.dismiss()
-        return _json.dumps({"ok": True, "message": "Kindling will not offer the intake again. "
-                                                    "Re-enable with /kindling undismiss."})
+        return _json.dumps({"ok": True, "message": "Onboard Me will not offer the intake again. "
+                                                    "Re-enable with /onboard undismiss."})
     if args == "undismiss":
         from . import engine
         engine.undismss()
         return _json.dumps({"ok": True})
     return _json.dumps({"error": f"unknown subcommand {args!r}",
-                        "usage": "/kindling [status|start [name]|client <name>|setup|finish|dismiss]"})
+                        "usage": "/onboard [status|start [name]|client <name>|setup|finish|dismiss]"})
 
 
 def register(ctx):
@@ -83,7 +83,7 @@ def register(ctx):
     for name, schema in SCHEMAS.items():
         ctx.register_tool(
             name=name,
-            toolset="kindling",
+            toolset="onboard",
             schema=schema,
             handler=HANDLERS[name],
             description=TOOL_DESCRIPTIONS.get(name, name),
@@ -93,8 +93,8 @@ def register(ctx):
 
     try:
         ctx.register_command(
-            "kindling", _slash_kindling,
-            description="Onboarding intake: /kindling [status|start [name]|client <name>|setup|finish|dismiss]",
+            "onboard", _slash_onboard,
+            description="Onboarding intake: /onboard [status|start [name]|client <name>|setup|finish|dismiss]",
             args_hint="[status|start|client <name>|setup|finish|dismiss]",
         )
     except Exception:
