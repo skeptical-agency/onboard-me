@@ -1,0 +1,23 @@
+name: kindling
+version: 0.1.0
+description: "Kindling: light your hearth — deep conversational onboarding for Hermes Agent. A guided intake (who you are, work, goals, taste, hard rules) that compiles into memory, plus a personalized setup walkthrough grounded in real beginner failure modes. Client-intake mode for agencies."
+author: Skeptical Agency
+homepage: https://github.com/skeptical-agency/kindling
+license: MIT
+tags: [onboarding, setup, intake, memory, beginners, personalization, agency]
+provides_tools:
+  - kindling_start
+  - kindling_next
+  - kindling_save
+  - kindling_status
+  - kindling_finish
+  - kindling_setup_check
+  - kindling_profiles
+provides_hooks:
+  - pre_llm_call
+config_schema:
+  auto_greet:
+    type: bool
+    default: true
+    label: "Offer intake on first session"
+    description: "On a fresh install with no profiles, the agent briefly offers the deep intake once per session until one exists. /kindling dismiss turns this off permanently."
