@@ -1,5 +1,5 @@
 name: onboard-me
-version: 0.1.0
+version: 0.1.1
 description: "Onboard Me: the deep-intake onboarding for Hermes Agent. A guided intake (who you are, work, goals, taste, hard rules) that compiles into memory, plus a personalized setup walkthrough grounded in real beginner failure modes. Client-intake mode for agencies."
 author: Skeptical Agency
 homepage: https://github.com/skeptical-agency/onboard-me

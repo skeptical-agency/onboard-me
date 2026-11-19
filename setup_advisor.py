@@ -11,7 +11,12 @@ import platform
 import re
 from pathlib import Path
 
-HERMES_HOME = Path(os.environ.get("HERMES_HOME", Path.home() / ".hermes"))
+
+def _hermes_home() -> Path:
+    """Resolve the Hermes home at call time via the runtime's own resolver
+    (context override -> HERMES_HOME env -> platform default)."""
+    from hermes_constants import get_hermes_home
+    return Path(get_hermes_home())
 
 # Symptom -> fix knowledge base (sources: official FAQ/troubleshooting docs,
 # NousResearch/hermes-agent issues, awesome-hermes-agent troubleshooting).
@@ -68,31 +73,27 @@ FAQ = [
 
 
 def _read_config() -> dict:
-    """Parse ~/.hermes/config.yaml without a yaml dependency (regex-level only,
-    presence checks — values are never reported for secret-looking keys)."""
-    p = HERMES_HOME / "config.yaml"
+    """Parse the Hermes config.yaml via the runtime's hermes_yaml module
+    (regex-level fallback only — presence checks; values are never reported
+    for secret-looking keys)."""
+    p = _hermes_home() / "config.yaml"
     if not p.exists():
         return {}
     try:
-        import yaml  # present in the Hermes runtime
-        return yaml.safe_load(p.read_text()) or {}
+        from hermes_yaml import safe_load  # the Hermes runtime's YAML policy module
+        return safe_load(p.read_text()) or {}
     except Exception:
         return {"_raw": p.read_text(errors="replace")}
 
 
 def _env_key_names() -> set:
-    names = set()
-    p = HERMES_HOME / ".env"
-    if p.exists():
-        for line in p.read_text(errors="replace").splitlines():
-            m = re.match(r"\s*(?:export\s+)?([A-Z0-9_]+)\s*=", line)
-            if m:
-                names.add(m.group(1))
-    names.update(k for k in os.environ if re.match(r"^[A-Z0-9_]+$", k))
-    return names
+    """Key NAMES visible in this process's environment (never values, and the
+    .env file itself is never opened)."""
+    return {k for k in os.environ if re.match(r"^[A-Z0-9_]+$", k)}
 
 
 def check() -> dict:
+    home = _hermes_home()
     cfg = _read_config()
     raw = cfg.get("_raw", "")
     env_names = _env_key_names()
@@ -108,8 +109,8 @@ def check() -> dict:
         model_default = m.group(1) if m else ""
     provider_keys = [k for k in env_names if re.search(
         r"(OPENROUTER|ANTHROPIC|OPENAI|NOUS|GEMINI|GOOGLE|ZHIPU|MOONSHOT|MINIMAX|DEEPSEEK|GROQ).*(_API_KEY|_KEY|_TOKEN)$", k)]
-    portal_auth = (HERMES_HOME / "auths.json").exists() or any(
-        "portal" in str(p.name).lower() for p in HERMES_HOME.glob("*"))
+    portal_auth = (home / "auth.json").exists() or any(
+        "portal" in str(p.name).lower() for p in home.glob("*"))
     if model_default:
         healthy.append(f"model configured: {model_default}")
     else:
@@ -154,7 +155,7 @@ def check() -> dict:
     healthy.append(f"MCP servers: {len(mcp_names)}" + (f" ({', '.join(mcp_names[:6])})" if mcp_names else ""))
 
     plug_dirs = []
-    for base in (HERMES_HOME / "plugins",):
+    for base in (home / "plugins",):
         if base.exists():
             plug_dirs = [p.name for p in base.iterdir() if (p / "plugin.yaml").exists()]
     healthy.append(f"plugins installed: {len(plug_dirs)}" + (f" ({', '.join(plug_dirs[:5])})" if plug_dirs else ""))
@@ -164,12 +165,12 @@ def check() -> dict:
                       "why": "Plugins add tools, connectors and automations in one command."})
 
     skills_dirs = []
-    for base in (HERMES_HOME / "skills",):
+    for base in (home / "skills",):
         if base.exists():
             skills_dirs = [p for p in base.rglob("SKILL.md")]
     healthy.append(f"skills present: {len(skills_dirs)}")
 
-    cron_dir = HERMES_HOME / "cron"
+    cron_dir = home / "cron"
     n_crons = len(list(cron_dir.rglob("*.json"))) if cron_dir.exists() else 0
     healthy.append(f"cron jobs: {n_crons}")
 
@@ -190,7 +191,7 @@ def check() -> dict:
                          "you on the release your docs match."})
 
     return {
-        "hermes_home": str(HERMES_HOME),
+        "hermes_home": str(home),
         "platform": f"{sysname} {platform.release()}",
         "healthy": healthy,
         "missing": missing,

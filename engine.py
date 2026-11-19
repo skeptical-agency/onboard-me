@@ -21,7 +21,8 @@ def _data_dir() -> Path:
         from plugins.plugin_storage import plugin_data_dir  # documented public API
         return Path(plugin_data_dir("onboard-me"))
     except Exception:
-        p = Path.home() / ".hermes" / "plugin-data" / "onboard-me"
+        from hermes_constants import get_hermes_home  # runtime resolver; no hardcoded paths
+        p = Path(get_hermes_home()) / "plugin-data" / "onboard-me"
         p.mkdir(parents=True, exist_ok=True)
         return p
 
